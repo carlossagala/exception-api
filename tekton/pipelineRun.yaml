@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: test-
+  generateName: test-5-
 spec:
   pipelineRef:
     name: nodejs-pipeline
@@ -14,3 +14,36 @@ spec:
   - name: shared-workspace
     persistentVolumeClaim:
       claimName: tekton
+  - name: gitops
+    persistentVolumeClaim:
+      claimName: gitops
+
+
+
+
+
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: test-5-
+spec:
+  pipelineRef:
+    name: nodejs-pipeline
+  params:
+    - name: GIT_URL
+      value: https://github.com/carlossagala/exception-api.git
+    - value: main
+      name: REVISION
+  workspaces:
+      - name: shared-workspace
+        volumeClaimTemplate:
+          metadata:
+            annotations:
+              volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/aws-ebs
+              volume.kubernetes.io/selected-node: ip-10-0-146-166.us-east-2.compute.internal
+            name: ws-pvc
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+               requests:
+                  storage: 1Gi

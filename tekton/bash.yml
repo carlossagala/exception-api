@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+    name: bash
+spec:
+  params:
+    - default: ""
+      description: script
+      name: SCRIPT
+      type: string
+  steps:
+    - image: 'bash:latest'
+      name: bash
+      resources: {}
+      script: |
+       $(params.SCRIPT)
+      workingDir: $(workspaces.source.path)
+  workspaces:
+    - mountPath: /workspace/source
+      name: source

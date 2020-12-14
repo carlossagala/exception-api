@@ -1,0 +1,31 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: oc-get-last-tag
+spec:
+  params:
+    - default: "api"
+      description: "app"
+      name: APP_NAME
+      type: string
+    - default: "namespace"
+      description: "namespace"
+      name: NAMESPACE
+      type: string
+    - default: ""
+      description: image
+      name: IMAGE
+      type: string
+  steps:
+    - image: 'image-registry.openshift-image-registry.svc:5000/openshift/cli:latest'
+      name: get-tag
+      resources: {}
+      script: |-
+          TAGS=$(oc get is $(params.APP_NAME) -n $(params.NAMESPACE) -o 'go-template={{ "0 " }}{{         range .status.tags }}{{ if ne .tag "latest" }}{{ .tag }}{{"         "}}{{end}}{{end}}')  
+          TAG_MAX_VERSION=0  
+          { for tag in ${TAGS[@]}; do (($tag > $TAG_MAX_VERSION)) && TAG_MAX_VERSION=$tag; done } &> /dev/null
+          NEW_TAG=$((${TAG_MAX_VERSION}+1))
+          echo "##### Nuevo Image Tag: $NEW_TAG #####"
+          echo $NEW_TAG | tee $(results.tag.path)
+  results:
+    - name: tag

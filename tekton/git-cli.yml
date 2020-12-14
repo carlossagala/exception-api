@@ -1,0 +1,56 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: git-cli
+spec:
+  description: >-
+    This task can be used to perform git operations. Git command that needs to
+    be run can be passed as a script to the task.This task needs authentication
+    to git in order to push after the git operation.
+  params:
+    - default: >-
+        docker.io/alpine/git:v2.26.2@sha256:8715680f27333935bb384a678256faf8e8832a5f2a0d4a00c9d481111c5a29c0
+      description: |
+        The base image for the task.
+      name: BASE_IMAGE
+      type: string
+    - default: ''
+      description: |
+        Git user name for performing git operation.
+      name: GIT_USER_NAME
+      type: string
+    - default: ''
+      description: |
+        Git user email for performing git operation.
+      name: GIT_USER_EMAIL
+      type: string
+    - default: |
+        git help
+      description: The git script to run.
+      name: GIT_SCRIPT
+      type: string
+  results:
+    - description: The precise commit SHA after the git operation.
+      name: commit
+  steps:
+    - image: $(params.BASE_IMAGE)
+      name: git
+      resources: {}
+      script: |
+        # Setting up the config for the git.
+        git config --global user.email "$(params.GIT_USER_EMAIL)"
+        git config --global user.name "$(params.GIT_USER_NAME)"
+        $(params.GIT_SCRIPT)
+        RESULT_SHA="$(git rev-parse HEAD | tr -d '\n')"
+        EXIT_CODE="$?"
+        if [ "$EXIT_CODE" != 0 ]
+        then
+          exit $EXIT_CODE
+        fi
+        # Make sure we don't add a trailing newline to the result!
+        echo -n "$RESULT_SHA" > $(results.commit.path)
+      workingDir: $(workspaces.gitops.path)
+  workspaces:
+    - description: A workspace that contains the fetched git repository.
+      name: source
+    - name: gitops

@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: import-image
+spec:
+  params:
+  - name: APP_VERSION
+    type: string
+  - name: IMAGE
+    type: string
+  - name: NAMESPACE
+    type: string
+  steps:
+  - image: quay.io/openshift/origin-cli:4.4
+    name: edit
+    resources: {}
+    script: |-
+      oc import-image $(params.APP_VERSION) --from $(params.IMAGE) -n $(params.NAMESPACE) --reference-policy='local' --confirm
+    securityContext:
+      privileged: true

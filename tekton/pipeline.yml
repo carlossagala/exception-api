@@ -12,22 +12,41 @@ spec:
       description: revision to be used from repo of the code for deployment
       name: REVISION
       type: string
-    - default: "test"
+    - default: "image-registry.openshift-image-registry.svc:5000/exceptions/api"
       description: revision to be used from repo of the code for deployment
       name: IMAGE
       type: string    
+    - default: "kubernetes/deployment-template.yaml"
+      description: template
+      name: TEMPLATE
+      type: string
   tasks:
+    - name: get-tag
+      taskRef:
+        kind: Task
+        name: oc-get-last-tag
+      params:
+      - name: APP_NAME
+        value: api
+      - name: NAMESPACE
+        value: exceptions 
+      - name: IMAGE
+        value: $(params.IMAGE)
     - name: git-clone
       taskRef:
         kind: ClusterTask
         name: git-clone
+      runAfter:
+        - get-tag
       params:
         - name: url
           value: $(params.GIT_URL) 
         - name: revision
           value: $(params.REVISION) 
+        - name: deleteExisting
+          value: "true"
       workspaces:
-      - name: source
+      - name: output
         workspace: shared-workspace
     - name: build-nodejs-app
       taskRef:
@@ -35,11 +54,68 @@ spec:
         name: s2i-nodejs
       params:
         - name: IMAGE
-          value: "image-registry.openshift-image-registry.svc:5000/exceptions/api:latest"
+          value: '$(params.IMAGE):$(tasks.get-tag.results.tag)'
+        - name: TLSVERIFY
+          value: "false"
       runAfter:
         - git-clone
       workspaces:
       - name: source
         workspace: shared-workspace
+    - name: update-manifest 
+      taskRef:
+        kind: Task
+        name: bash
+      params:
+        - name: SCRIPT
+          value: |-
+              cat $(params.TEMPLATE)
+              cat $(params.TEMPLATE) | sed "s@#image@$(params.IMAGE):$(tasks.get-tag.results.tag)@g" > deployment.yaml
+              cat deployment.yaml
+      runAfter:
+        - build-nodejs-app
+      workspaces:
+      - name: source
+        workspace: shared-workspace
+    - name: import-image 
+      taskRef:
+        kind: Task
+        name: import-image
+      params:
+        - name: APP_VERSION
+          value: exceptions:$(tasks.get-tag.results.tag)
+        - name: IMAGE
+          value: $(params.IMAGE):$(tasks.get-tag.results.tag)
+        - name: NAMESPACE
+          value: exceptions
+      runAfter:
+        - build-nodejs-app
+    - name: git-cli
+      params:
+        - name: GIT_USER_NAME
+          value: csagala
+        - name: GIT_USER_EMAIL
+          value: csagala@redhat.com
+        - name: GIT_SCRIPT
+          value: |-
+            rm -r ./*
+            git clone https://github.com/carlossagala/exceptions-api-gitops.git
+            cd exceptions-api-gitops
+            cp $(workspaces.source.path)/deployment.yaml .
+            git add .
+            git commit -m "image $(params.IMAGE):$(tasks.get-tag.results.tag)"
+            git push origin main
+      runAfter:
+        - import-image
+        - update-manifest
+      taskRef:
+        kind: Task
+        name: git-cli
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: gitops
+          workspace: gitops
   workspaces:
     - name: shared-workspace
+    - name: gitops
