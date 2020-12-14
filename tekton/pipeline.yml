@@ -1,0 +1,45 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: nodejs-pipeline
+spec:
+  params:
+    - description: url of the git repo for the code of deployment
+      name: GIT_URL
+      type: string
+      default: "test"
+    - default: "test"
+      description: revision to be used from repo of the code for deployment
+      name: REVISION
+      type: string
+    - default: "test"
+      description: revision to be used from repo of the code for deployment
+      name: IMAGE
+      type: string    
+  tasks:
+    - name: git-clone
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.GIT_URL) 
+        - name: revision
+          value: $(params.REVISION) 
+      workspaces:
+      - name: source
+        workspace: shared-workspace
+    - name: build-nodejs-app
+      taskRef:
+        kind: ClusterTask
+        name: s2i-nodejs
+      params:
+        - name: IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/exceptions/api:latest"
+      runAfter:
+        - git-clone
+      workspaces:
+      - name: source
+        workspace: shared-workspace
+  workspaces:
+    - name: shared-workspace

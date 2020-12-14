@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: test-
+spec:
+  pipelineRef:
+    name: nodejs-pipeline
+  params:
+    - name: GIT_URL
+      value: https://github.com/carlossagala/exception-api.git
+    - value: main
+      name: REVISION
+  workspaces:
+  - name: shared-workspace
+    persistentVolumeClaim:
+      claimName: tekton
