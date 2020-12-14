@@ -1,0 +1,149 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  creationTimestamp: "2020-12-14T17:18:57Z"
+  generation: 32
+  name: staging
+  namespace: argocd
+  resourceVersion: "564004"
+  selfLink: /apis/argoproj.io/v1alpha1/namespaces/argocd/applications/staging
+  uid: 0032eac9-f709-46c5-a5cb-fa1957e7b71b
+spec:
+  destination:
+    namespace: exceptions
+    server: https://kubernetes.default.svc
+  project: exceptions
+  source:
+    kustomize:
+      namePrefix: staging
+    path: overlays/staging
+    repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+    targetRevision: staging
+status:
+  health:
+    status: Progressing
+  history:
+  - deployStartedAt: "2020-12-14T17:19:07Z"
+    deployedAt: "2020-12-14T17:19:09Z"
+    id: 0
+    revision: 5cdb66aefead8dd9d3b540407d959b68ba8e3870
+    source:
+      kustomize:
+        namePrefix: staging
+      path: overlays/staging
+      repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+      targetRevision: staging
+  - deployStartedAt: "2020-12-14T17:20:35Z"
+    deployedAt: "2020-12-14T17:20:37Z"
+    id: 1
+    revision: 8794a2a788f749cee605fa8d80a31eede9756c6b
+    source:
+      kustomize:
+        namePrefix: staging
+      path: overlays/staging
+      repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+      targetRevision: staging
+  operationState:
+    finishedAt: "2020-12-14T17:20:37Z"
+    message: successfully synced (all tasks run)
+    operation:
+      initiatedBy:
+        username: admin
+      retry: {}
+      sync:
+        revision: 8794a2a788f749cee605fa8d80a31eede9756c6b
+        syncStrategy:
+          hook: {}
+    phase: Succeeded
+    startedAt: "2020-12-14T17:20:35Z"
+    syncResult:
+      resources:
+      - group: ""
+        hookPhase: Running
+        kind: ConfigMap
+        message: configmap/stagingexceptions-cm configured
+        name: stagingexceptions-cm
+        namespace: exceptions
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/stagingexceptions unchanged
+        name: stagingexceptions
+        namespace: exceptions
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        kind: Deployment
+        message: deployment.apps/stagingexceptions configured
+        name: stagingexceptions
+        namespace: exceptions
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: route.openshift.io
+        hookPhase: Running
+        kind: Route
+        message: route.route.openshift.io/stagingexceptions unchanged
+        name: stagingexceptions
+        namespace: exceptions
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      revision: 8794a2a788f749cee605fa8d80a31eede9756c6b
+      source:
+        kustomize:
+          namePrefix: staging
+        path: overlays/staging
+        repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+        targetRevision: staging
+  reconciledAt: "2020-12-14T17:26:40Z"
+  resources:
+  - kind: ConfigMap
+    name: stagingexceptions-cm
+    namespace: exceptions
+    status: Synced
+    version: v1
+  - health:
+      status: Healthy
+    kind: Service
+    name: stagingexceptions
+    namespace: exceptions
+    status: Synced
+    version: v1
+  - group: apps
+    health:
+      message: 'Waiting for rollout to finish: 0 of 1 updated replicas are available...'
+      status: Progressing
+    kind: Deployment
+    name: stagingexceptions
+    namespace: exceptions
+    status: Synced
+    version: v1
+  - group: route.openshift.io
+    kind: Route
+    name: stagingexceptions
+    namespace: exceptions
+    status: Synced
+    version: v1
+  sourceType: Kustomize
+  summary:
+    images:
+    - image-registry.openshift-image-registry.svc:5000/exceptions/api:8
+  sync:
+    comparedTo:
+      destination:
+        namespace: exceptions
+        server: https://kubernetes.default.svc
+      source:
+        kustomize:
+          namePrefix: staging
+        path: overlays/staging
+        repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+        targetRevision: staging
+    revision: 8794a2a788f749cee605fa8d80a31eede9756c6b
+    status: Synced

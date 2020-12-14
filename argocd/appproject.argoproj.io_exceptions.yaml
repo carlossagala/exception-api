@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  creationTimestamp: "2020-12-14T16:56:57Z"
+  generation: 1
+  name: exceptions
+  namespace: argocd
+  resourceVersion: "552557"
+  selfLink: /apis/argoproj.io/v1alpha1/namespaces/argocd/appprojects/exceptions
+  uid: 3bbb7cec-cfa5-4fb7-8698-55ae374761a6
+spec:
+  destinations:
+  - namespace: exceptions
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - https://github.com/carlossagala/exceptions-api-gitops.git
+status: {}

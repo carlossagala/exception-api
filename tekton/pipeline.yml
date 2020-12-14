@@ -101,7 +101,7 @@ spec:
             rm -r ./*
             git clone https://github.com/carlossagala/exceptions-api-gitops.git
             cd exceptions-api-gitops
-            cp $(workspaces.source.path)/deployment.yaml .
+            cp $(workspaces.source.path)/deployment.yaml ./base/
             git add .
             git commit -m "image $(params.IMAGE):$(tasks.get-tag.results.tag)"
             git push origin main

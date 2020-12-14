@@ -1,0 +1,147 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  creationTimestamp: "2020-12-14T17:09:49Z"
+  generation: 45
+  name: testing
+  namespace: argocd
+  resourceVersion: "564003"
+  selfLink: /apis/argoproj.io/v1alpha1/namespaces/argocd/applications/testing
+  uid: 2664e711-5b01-43d5-b542-bd08eafdaa1d
+spec:
+  destination:
+    namespace: exceptions
+    server: https://kubernetes.default.svc
+  project: exceptions
+  source:
+    path: overlays/testing
+    repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+    targetRevision: main
+status:
+  health:
+    status: Progressing
+  history:
+  - deployStartedAt: "2020-12-14T17:10:00Z"
+    deployedAt: "2020-12-14T17:10:02Z"
+    id: 0
+    revision: 2408b6ef41417fde5485649483a165775c9d9b78
+    source:
+      path: overlays/testing
+      repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+      targetRevision: main
+  - deployStartedAt: "2020-12-14T17:12:07Z"
+    deployedAt: "2020-12-14T17:12:09Z"
+    id: 1
+    revision: 249894308098295cbd7f8827406068e4e5de954d
+    source:
+      path: overlays/testing
+      repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+      targetRevision: main
+  - deployStartedAt: "2020-12-14T17:13:34Z"
+    deployedAt: "2020-12-14T17:13:36Z"
+    id: 2
+    revision: 5cdb66aefead8dd9d3b540407d959b68ba8e3870
+    source:
+      path: overlays/testing
+      repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+      targetRevision: main
+  operationState:
+    finishedAt: "2020-12-14T17:13:36Z"
+    message: successfully synced (all tasks run)
+    operation:
+      initiatedBy:
+        username: admin
+      retry: {}
+      sync:
+        revision: 5cdb66aefead8dd9d3b540407d959b68ba8e3870
+        syncStrategy:
+          hook: {}
+    phase: Succeeded
+    startedAt: "2020-12-14T17:13:34Z"
+    syncResult:
+      resources:
+      - group: ""
+        hookPhase: Running
+        kind: ConfigMap
+        message: configmap/exceptions-cm configured
+        name: exceptions-cm
+        namespace: exceptions
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: ""
+        hookPhase: Running
+        kind: Service
+        message: service/exceptions unchanged
+        name: exceptions
+        namespace: exceptions
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: apps
+        hookPhase: Running
+        kind: Deployment
+        message: deployment.apps/exceptions configured
+        name: exceptions
+        namespace: exceptions
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      - group: route.openshift.io
+        hookPhase: Running
+        kind: Route
+        message: route.route.openshift.io/exceptions unchanged
+        name: exceptions
+        namespace: exceptions
+        status: Synced
+        syncPhase: Sync
+        version: v1
+      revision: 5cdb66aefead8dd9d3b540407d959b68ba8e3870
+      source:
+        path: overlays/testing
+        repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+        targetRevision: main
+  reconciledAt: "2020-12-14T17:26:40Z"
+  resources:
+  - kind: ConfigMap
+    name: exceptions-cm
+    namespace: exceptions
+    status: Synced
+    version: v1
+  - health:
+      status: Healthy
+    kind: Service
+    name: exceptions
+    namespace: exceptions
+    status: Synced
+    version: v1
+  - group: apps
+    health:
+      message: 'Waiting for rollout to finish: 0 of 1 updated replicas are available...'
+      status: Progressing
+    kind: Deployment
+    name: exceptions
+    namespace: exceptions
+    status: Synced
+    version: v1
+  - group: route.openshift.io
+    kind: Route
+    name: exceptions
+    namespace: exceptions
+    status: Synced
+    version: v1
+  sourceType: Kustomize
+  summary:
+    images:
+    - image-registry.openshift-image-registry.svc:5000/exceptions/api:8
+  sync:
+    comparedTo:
+      destination:
+        namespace: exceptions
+        server: https://kubernetes.default.svc
+      source:
+        path: overlays/testing
+        repoURL: https://github.com/carlossagala/exceptions-api-gitops.git
+        targetRevision: main
+    revision: 8794a2a788f749cee605fa8d80a31eede9756c6b
+    status: Synced

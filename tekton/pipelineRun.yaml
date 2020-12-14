@@ -20,7 +20,8 @@ spec:
 
 
 
-
+######## version con pv on demand
+##### cambiar annotations de storage segun corresponda
 
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
@@ -36,6 +37,18 @@ spec:
       name: REVISION
   workspaces:
       - name: shared-workspace
+        volumeClaimTemplate:
+          metadata:
+            annotations:
+              volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/aws-ebs
+              volume.kubernetes.io/selected-node: ip-10-0-146-166.us-east-2.compute.internal
+            name: ws-pvc
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+               requests:
+                  storage: 1Gi
+      - name: gitops
         volumeClaimTemplate:
           metadata:
             annotations:
